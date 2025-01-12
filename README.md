@@ -2,7 +2,33 @@
 
 [![NPM version](https://img.shields.io/npm/v/unplugin-exports?color=a1b858&label=)](https://www.npmjs.com/package/unplugin-exports)
 
-Add export macros in your project with unplugin.
+Add export macros in your project with unplugin. Most of time when you develop a library, you need add a lot of `export * from './xxx'` statements in your `index.ts` file, it is very annoying, this plugin can help you to add these statements by glob patterns.
+
+When you use this plugin, you can use `exporter.globAll` to add export statements by glob patterns, like this:
+
+```ts
+// index.ts
+exporter.globAll(['./**/*.ts'])
+```
+
+It will automatically exclude the `index.ts` file itself, and you can use `!` to exclude some files.
+
+```ts
+// index.ts
+exporter.globAll(['./**/*.ts', '!some-you-dont-want-to-export-file.ts'])
+```
+
+> I've had enough of writing "export * from './xxx'", really going crazy...
+
+This `exporter.globAll` function just can be used top level in a file, cannot be used in a function or other block.
+
+```ts
+// index.ts
+function foo() {
+  // ❌ This is not allowed, will throw runtime error because of the `exporter` is not defined!
+  exporter.globAll(['./**/*.ts'])
+}
+```
 
 ## Install
 

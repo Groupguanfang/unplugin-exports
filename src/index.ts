@@ -3,23 +3,30 @@ import type { Options } from './types'
 import path from 'node:path'
 import fg from 'fast-glob'
 import MagicString from 'magic-string'
+import { parseSync } from 'oxc-parser'
 import { createUnplugin } from 'unplugin'
-import { walkTopLevelGlobAll } from './core/ast'
+import { walkTopLevelGlobAllByOxc } from './core/ast'
 
-function parseFilePath(id: string): string {
+function parseFilePath(id: string, removeExt: boolean = true): string {
   if (!id.startsWith('/') && !id.startsWith('..') && !id.startsWith('./'))
-    return `./${id}`
+    id = `./${id}`
+
+  // remove the file extension
+  if (removeExt)
+    id = id.replace(/\.[^.]+$/, '')
+
   return id
 }
 
 export const unpluginFactory: UnpluginFactory<Options | undefined> = () => {
   return {
     name: 'unplugin-exports',
+    enforce: 'pre',
     transform(code, id) {
-      const ast = this.parse(code)
+      const { program } = parseSync(id, code)
       const ms = new MagicString(code)
 
-      walkTopLevelGlobAll(ast, (node) => {
+      walkTopLevelGlobAllByOxc(program, (node) => {
         ms.remove(node.start, node.end)
         const files = fg.sync(node.patterns, {
           cwd: path.dirname(id),
@@ -28,7 +35,7 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = () => {
         for (const file of files) {
           const filePath = parseFilePath(file)
           this.addWatchFile(filePath)
-          ms.appendRight(node.start, `export * from '${filePath}';\n`)
+          ms.appendRight(node.start, `\nexport * from '${filePath}';\n`)
         }
       })
 

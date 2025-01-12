@@ -1,0 +1,12 @@
+{
+  "name": "test-esbuild",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "tsx ./build.ts"
+  },
+  "dependencies": {
+    "tsx": "^4.19.2",
+    "unplugin-exports": "workspace:*"
+  }
+}

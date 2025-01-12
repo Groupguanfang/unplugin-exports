@@ -1,5 +1,4 @@
-import type { ArrayExpression, ExpressionStatement, Literal, Program } from 'estree'
-import type { AstNode } from 'rollup'
+import type * as oxc from 'oxc-parser'
 
 function typeAssert<T>(node: unknown): asserts node is T {}
 
@@ -12,17 +11,13 @@ export interface WalkerInfo extends SourceLocation {
   patterns: string[]
 }
 
-export function walkTopLevelGlobAll(ast: AstNode, walker: (info: WalkerInfo) => void): void {
-  if (ast.type !== 'Program')
-    return
-  typeAssert<Program>(ast)
-
+export function walkTopLevelGlobAllByOxc(ast: oxc.Program, walker: (info: WalkerInfo) => void): void {
   for (const node of ast.body) {
     if (node.type !== 'ExpressionStatement')
       continue
     if (node.expression.type !== 'CallExpression')
       continue
-    if (node.expression.callee.type !== 'MemberExpression')
+    if (node.expression.callee.type !== 'StaticMemberExpression')
       continue
     if (node.expression.callee.object.type !== 'Identifier')
       continue
@@ -33,9 +28,9 @@ export function walkTopLevelGlobAll(ast: AstNode, walker: (info: WalkerInfo) => 
     if (node.expression.callee.property.name !== 'globAll')
       continue
 
-    typeAssert<ExpressionStatement & SourceLocation>(node)
+    typeAssert<oxc.ExpressionStatement & SourceLocation>(node)
     const pattern = node.expression.arguments[0]
-    typeAssert<Literal | ArrayExpression>(pattern)
+    typeAssert<oxc.StringLiteral | oxc.ArrayExpression>(pattern)
 
     walker({
       start: node.start,
@@ -43,7 +38,7 @@ export function walkTopLevelGlobAll(ast: AstNode, walker: (info: WalkerInfo) => 
       patterns: pattern.type === 'Literal'
         ? [pattern.value as string]
         : pattern.elements.map((element) => {
-            typeAssert<Literal>(element)
+            typeAssert<oxc.StringLiteral>(element)
             return element.value as string
           }),
     })

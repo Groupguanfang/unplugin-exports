@@ -1,7 +1,7 @@
 {
   "name": "unplugin-exports",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "packageManager": "pnpm@9.9.0",
   "description": "Add export macros in your project with unplugin.",
   "license": "MIT",
@@ -60,6 +60,10 @@
     "./types": {
       "import": "./dist/types.js",
       "require": "./dist/types.cjs"
+    },
+    "./tsup": {
+      "import": "./dist/tsup.js",
+      "require": "./dist/tsup.cjs"
     },
     "./*": "./*"
   },
@@ -121,6 +125,8 @@
     }
   },
   "dependencies": {
+    "fast-glob": "^3.3.3",
+    "oxc-parser": "^0.45.0",
     "unplugin": "^1.12.2"
   },
   "devDependencies": {
@@ -132,7 +138,6 @@
     "chalk": "^5.3.0",
     "eslint": "^9.9.1",
     "esno": "^4.7.0",
-    "fast-glob": "^3.3.3",
     "nodemon": "^3.1.4",
     "rollup": "^4.21.2",
     "tsup": "^8.2.4",

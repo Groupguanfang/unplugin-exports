@@ -1,0 +1,1 @@
+exporter.globAll(['../hello.ts'])

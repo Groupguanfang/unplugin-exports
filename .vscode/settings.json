@@ -1,0 +1,12 @@
+{
+  "eslint.useFlatConfig": true,
+
+  // Disable auto format on save
+  "prettier.enable": false,
+  "editor.formatOnSave": false,
+
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "never"
+  }
+}
